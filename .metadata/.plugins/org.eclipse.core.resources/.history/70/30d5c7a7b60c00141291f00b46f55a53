@@ -1,0 +1,512 @@
+<?php 
+include_once 'DatabaseConnect.php';
+class Child_Functions{
+	
+	function VerificationParent($parentEmail, $name, $hash){
+		$to = $parentEmail;
+		$subject = 'Karisma Kidz verification';
+		$message = 'Hi '.$parentEmail.' /n
+				You have received this email because your child, '.$name.' has signed up to Karisma Kidz. \n
+				Karisma Kidz is a computer game designed to improve the emotional intelligence of children' .$email. '\n\n
+				Please create an account to interact with your child on the game.\n
+				http://www.karismakidz.co.uk/RegisterParent.php?email='.$email.'&hash='.$hash.' ';
+		$headers = 'From noreply@karismakidz.co.uk';
+		mail($to, $subject, $message, $headers);
+	}
+	
+	
+	function childFamilyAdd($parentEmail,$user){ 
+		include '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		
+		function mailAddChild($parentEmail, $user){
+			$to = $parentEmail;
+			$subject = 'Karisma Kidz Child Successfully Added';
+			$message = "Hi '.$parentEmail.' /n
+				You have received this email because your child, '.$user.' has signed up to Karisma Kidz, 
+				and successfully been added to your family account. \n";
+			$headers = 'From noreply@karismakidz.co.uk';
+			if(mail($to, $subject, $message, $headers)){
+				return true;
+			}
+		}
+		
+		
+		$querypCheck= "SELECT * FROM Families WHERE Parent1 ='".$parentEmail."' OR Parent2 ='".$parentEmail."'";
+		if($parentCheck = $mysqli->query($querypCheck)){
+			
+			if(!mysqli_num_rows($parentCheck)<1){
+				echo 'Family database already exists<br>';
+
+				$cCheck1= "SELECT Child1 FROM Families WHERE Parent1 ='".$parentEmail."' AND Child1 = ''";
+				$cCheck_1 = $mysqli->query($cCheck1);
+				$cCheck2= "SELECT Child2 FROM Families WHERE Parent1 ='".$parentEmail."' AND Child2 = ''";
+				$cCheck_2 = $mysqli->query($cCheck2);
+				$cCheck3= "SELECT Child3 FROM Families WHERE Parent1 ='".$parentEmail."' AND Child3 = ''";
+				$cCheck_3 = $mysqli->query($cCheck3);
+				$cCheck4= "SELECT Child4 FROM Families WHERE Parent1 ='".$parentEmail."' AND Child4 = ''";
+				$cCheck_4 = $mysqli->query($cCheck4);
+				$cCheck5= "SELECT Child5 FROM Families WHERE Parent1 ='".$parentEmail."' AND Child5 = ''";
+				$cCheck_5 = $mysqli->query($cCheck5);
+				
+				if(!mysqli_num_rows($cCheck_1)<1){
+					$addonQuery1 = "UPDATE `Families` SET `Child1` = '".$user."' 
+									WHERE `Parent1` = '".$parentEmail."' OR `Parent2` = '".$parentEmail."'";
+					if($addChild1 = $mysqli->query($addonQuery1)){
+						if(mailAddChild($parentEmail, $user)){
+							echo 'Successfully added to family account';
+						}
+					}else{
+						echo 'died';
+					}
+				}else if(!mysqli_num_rows($cCheck_2)<1){
+					$addonQuery2 = "UPDATE `Families` SET `Child2` = '".$user."' 
+									WHERE `Parent1` = '".$parentEmail."' OR `Parent2` = '".$parentEmail."'";
+					if($addChild2 = $mysqli->query($addonQuery2)){
+						if(mailAddChild($parentEmail, $user)){
+								echo 'Successfully added to family account';
+							}
+					}
+				}else if(!mysqli_num_rows($cCheck_3)<1){
+					$addonQuery3 = "UPDATE `Families` SET `Child3` = '".$user."' 
+									WHERE `Parent1` = '".$parentEmail."' OR `Parent2` = '".$parentEmail."'";
+					if($addChild3 = $mysqli->query($addonQuery3)){
+						if(mailAddChild($parentEmail, $user)){
+							echo 'Successfully added to family account';
+						}
+					}
+				}else if(!mysqli_num_rows($cCheck_4)<1){
+	
+					$addonQuery4 = "UPDATE `Families` SET `Child4` = '".$user."' 
+									WHERE `Parent1` = '".$parentEmail."' OR `Parent2` = '".$parentEmail."'";
+					$addChild4 = $mysqli->query($addonQuery4);
+					if($addChild4 = $mysqli->query($addonQuery4)){
+						if(mailAddChild($parentEmail, $user)){
+							echo 'Successfully added to family account';
+						}
+					}
+				}else if(!mysqli_num_rows($cCheck_5)<1){
+					$addonQuery5 = "UPDATE `Families` SET `Child5` = '".$user."'
+									WHERE `Parent1` = '".$parentEmail."' OR `Parent2` = '".$parentEmail."'";
+					$addChild5 = $mysqli->query($addonQuery5);
+					if($addChild5 = $mysqli->query($addonQuery5)){
+						if(mailAddChild($parentEmail, $user)){
+							echo 'Successfully added to family account';
+						}
+					}
+				}else 
+					echo "Family database full, please select a new parent address.<br>";
+					die();
+					
+			}else{
+				echo 'Could not query database';
+			}
+			
+		}else{
+			//Place parent account as relative (yet to be activated)
+			$familyQuery = "INSERT INTO Families (Child1) VALUES (?)";
+			if($stmt1 = $mysqli -> prepare($familyQuery) ){
+				$stmt1 ->bind_param("s",$user);
+				$stmt1 ->execute();
+				$stmt1 ->bind_result($result);
+				$stmt1->close();
+				echo 'Family account opened by Child';
+			}else{
+				echo 'Failed query'.$mysqli->error;
+			}
+		}
+	}
+	
+	
+	function GetCharms($user){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$query = "SELECT Charms
+				FROM Child_Account
+				WHERE Username = '".$user."'
+				";
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		while($row = $result->fetch_assoc()){
+			echo $row['Charms'];
+		}
+	}
+	
+	function GetKash($user){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$query = "SELECT Kash
+				FROM Child_Account
+				WHERE Username = '".$user."'
+				";
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		while($row = $result->fetch_assoc()){
+			echo $row['Kash'];
+		}
+	}
+	function GetStarz($user){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$query = "SELECT Starz
+				FROM Child_Account
+				WHERE Username = '".$user."'";
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		while($row = $result->fetch_assoc()){
+			echo $row['Starz'];
+		}
+	}
+	
+	function SpendCharms($user, $amount,$reason){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$query = "SELECT Charms
+				FROM Child_Account
+				WHERE Username = '".$user."'";
+
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		$row = $result->fetch_assoc();
+		$new = $row['Charms']-$amount;
+		
+		$updQuery = "UPDATE Child_Account
+				SET Charms = '".$new."'
+				WHERE Username = '".$user."'";
+		if(!$result=$mysqli->query($updQuery)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		echo $new;
+	}
+	
+	function SpendStarz($user, $amount,$reason){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$query = "SELECT Starz
+				FROM Child_Account
+				WHERE Username = '".$user."'";
+	
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		$row = $result->fetch_assoc();
+		$new = $row['Starz']-$amount;
+	
+		$updQuery = "UPDATE Child_Account
+				SET Starz = '".$new."'
+				WHERE Username = '".$user."'";
+		if(!$result=$mysqli->query($updQuery)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		echo $new;
+	}
+	
+	
+	function AddRemoveKash($user, $amount,$reason){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$query = "SELECT Kash
+				FROM Child_Account
+				WHERE Username = '".$user."'";
+	
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		$row = $result->fetch_assoc();
+		$new = $row['Kash']-$amount;
+	
+		$updQuery = "UPDATE Child_Account
+				SET Kash = '".$new."'
+				WHERE Username = '".$user."'";
+		if(!$result=$mysqli->query($updQuery)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		echo $new;
+	}
+	
+	function AddNewTask($child, $taskInfo, $frequency){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		
+		date_default_timezone_set("Europe/London");
+		$time = time();
+		$expiry = $time+86400*$frequency;
+
+		$updateQuery = "INSERT INTO Child_Tasks (User, Description, repeat_frequency, time_of_day, expiry)
+						VALUES (?, ?,?,?,?)
+						";
+		
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('sssss', $child, $taskInfo, $frequency, $time, $expiry);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Updated fields';
+		}else{
+			echo 'Could not update fields';
+		}
+		
+	$mysqli->close();
+	}
+
+	function EditTask($taskID, $newTaskInfo){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$updateQuery = "UPDATE Child_Tasks 
+						SET Description = ?
+						WHERE id = ?
+						";
+		
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('ss', $newTaskInfo, $taskID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Updated fields';
+		}else{
+			echo 'Could not update fields';
+		}
+		$mysqli->close();	
+	}
+	
+	function CompleteTask($taskID){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$updateQuery = "UPDATE Child_Tasks
+						SET completion_state = 1, Confirmed = 2, Expiry = 100
+						WHERE id = ?";
+		/*
+		$checkParents = "UPDATE Child_Tasks
+						SET Confirmed = 2
+						WHERE id = ?";
+		
+		if($upd1 = $mysqli->prepare($checkParents)){
+			$upd1->bind_param('s', $taskID);
+			$upd1->execute();
+			$upd1->bind_result($login1);
+			$upd1->fetch();
+			echo 'Sent request to parents';
+		}else{
+			echo 'Could not update fields';
+		}
+		*/
+	
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('s', $taskID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Updated fields';
+		}else{
+			echo 'Could not update fields';
+		}
+		$mysqli->close();
+	}
+	
+	
+	function ConfirmTask($taskID){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$updateQuery = "UPDATE Child_Tasks
+						SET Confirmed = 1
+						WHERE id = ?";
+	
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('s', $taskID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Task confirmed as completed';
+		}else{
+			echo 'Could not update fields';
+		}
+		$mysqli->close();
+	}
+	
+	
+	
+	function DeleteTask($taskID){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$updateQuery = "DELETE FROM Child_Tasks WHERE id = ?";
+	
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('s',$taskID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Updated fields';
+		}else{
+			echo 'Could not update fields';
+		}
+	$mysqli->close();
+	}
+	
+	
+
+	function EditChildTimeLimits($childID, $timeLimits){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+	
+		$updateQuery = "UPDATE Child_Account 
+						SET Time_Limits = ?
+						WHERE Username = ?";
+	
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('ss',$timeLimits,$childID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo 'Updated fields';
+		}else{
+			echo 'Could not update fields';
+		}
+		$mysqli->close();
+	}
+	
+	function scrollParents($email, $inviteeEmail){
+
+		$pCheck1= "SELECT Parent1 FROM Families WHERE Parent1 ='".$email."' AND Parent2 = ''";
+		$pCheck_1 = $mysqli->query($cCheck1);
+		$pCheck2= "SELECT Parent2 FROM Families WHERE Parent1 ='".$email."' AND Parent3 = ''";
+		$pCheck_2 = $mysqli->query($cCheck2);
+		
+		if(!mysqli_num_rows($pCheck_1)<1){
+			$addonQuery1 = "UPDATE `Families` SET `Parent2` = '".$email."'
+									WHERE `Parent1` = '".$inviteeEmail."' OR `Parent3` = '".$inviteeEmail."'";
+			if($addChild1 = $mysqli->query($addonQuery1)){
+				echo 'Successfully added to family account';
+				return true;
+			}else{
+				echo 'died';
+			}
+		}else if(!mysqli_num_rows($pCheck_1)<1){
+			$addonQuery1 = "UPDATE `Families` SET `Parent2` = '".$email."'
+									WHERE `Parent1` = '".$inviteeEmail."' OR `Parent3` = '".$inviteeEmail."'";
+			if($addChild1 = $mysqli->query($addonQuery1)){
+				echo 'Successfully added to family account';
+				return true;
+			}else{
+				echo 'died';
+			}
+		}
+	}
+	
+	function AddRelative($firstname, $lastname, $nickname, $email,$inviteeEmail){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		//check valid email address
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+			echo "Please enter a valid email address";
+			die();
+		}else{
+			
+			$queryEmReg= "SELECT * FROM parents WHERE email ='".$email."'";
+			$emailCheck = $mysqli->query($queryEmReg);
+			if(!mysqli_num_rows($emailCheck)<1){
+				echo 'Email address in use';
+			}else{
+				$sql = "INSERT INTO parents (FirstName, LastName, NickName, Email)
+						VALUES (?,?,?,?)";
+				$sqlFam = "INSERT INTO Families (Parent2)
+							VALUES (?,?,?,?)";
+				
+				$mail = new Parents();
+				//prepared query statements
+				if($stmt = $mysqli -> prepare($sql) ){
+					$stmt ->bind_param("ssss",$firstname, $lastname, $nickname, $email);
+					$stmt ->execute();
+					$stmt ->bind_result($result);
+
+					if($stmt->affected_rows>0 && scrollParents($email,$inviteeEmail)){
+						echo 'Email sent';
+						$mail->RelativeVerification($email, $firstname);
+					} else {
+						echo 'Error - could not register';
+					}
+					$stmt->close();
+				}else{
+					echo 'Failed query';
+				}
+			}
+		}
+		$connect->close();	
+	}
+	
+	function taskServer(){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$time = time();
+		
+		$query = "SELECT id FROM Child_Tasks WHERE Confirmed = 1";
+		if(!$result=$mysqli->query($query)){
+			die("N/A: Database Error:".$mysqli->error."");
+		}
+		while($row = $result->fetch_assoc()){
+			echo $row['id'];
+		}
+		
+		
+		
+		
+		$updateQuery = "DELETE FROM Child_Tasks WHERE Confirmed = 1";
+		
+		if($upd = $mysqli->prepare($updateQuery)){
+			$upd->bind_param('s', $taskID);
+			$upd->execute();
+			$upd->bind_result($login);
+			$upd->fetch();
+			echo '';
+		}else{
+			echo 'Could not delete task';
+		}
+		$mysqli->close();
+	}
+	
+	
+	
+	
+}
+
+$obj = new Child_Functions();
+//$obj->GetCharms('alex')
+//$obj->GetKash('alex')
+//$obj->GetStarz('alex')
+//$obj->SpendCharms('alex',1,'lost')
+//$obj->SpendStarz('alex',1,'lost')
+//$obj->AddRemoveKash('alex',-1,'lost')
+$obj->AddNewTask("Alex", '2', '12');
+//$obj->EditTask(24, 12);
+//$obj->CompleteTask(26);
+//$obj->DeleteTask(24);
+//$obj->EditChildTimeLimits('Ronny123','hi there');
+$obj->taskServer();
+
+
+
+?>

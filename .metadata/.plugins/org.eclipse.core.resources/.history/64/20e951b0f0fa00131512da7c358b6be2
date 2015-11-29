@@ -1,0 +1,23 @@
+<?php
+include 'DatabaseConnect.php';
+
+
+function alexPHP(){		
+	if($result = $db->query("SELECT * FROM people")){
+		if($count = $result->num_rows){
+			echo $count;
+			$rows = $result->fetch_assoc();
+			echo '<pre>', print_r($rows), '<pre>';
+		}
+	}
+}
+//Register User function
+
+//RegisterUser("alex_kell@hotmail.co.uk", "aldsfsfex", "sdfsdMr", "M", "AlexNdsfsdfick", "Alsdfex", "Kelsdfl");
+
+
+ResendVerificationEmail();
+
+
+?>
+html

@@ -1,0 +1,59 @@
+<?php
+require 'DatabaseConnect.php';
+require 'Parents.php';
+require 'Child_Functions.php';
+class Register_Child{
+		
+	function RegisterUser($username,$password,$name,$parentEmail,$avatarSetup,$avatarImage){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		
+		//check valid email address if entered
+		if(!filter_var($parentEmail, FILTER_VALIDATE_EMAIL)&& $parentEmail != null){
+			echo "Please try your parent's email address again";
+			die();
+		}
+		$md5_password=md5($password);
+		$hash = md5(rand(1,10000));
+
+		$add = new Child_Functions();
+		
+		//Function which either adds or creates new family entry
+		$add->childFamilyAdd($parentEmail, $username);//NEED TO INSERT ID NOT USERNAME
+		
+		$queryEmReg= "SELECT '".$username."' FROM Child_Account WHERE email ='".$email."'";
+		$emailCheck = $mysqli->query($queryEmReg);
+		if(!mysqli_num_rows($emailCheck)<1){
+			echo 'Username already in use';
+			echo $queryEmReg;
+		}else{
+			$sql = "INSERT INTO Child_Account (Username,Password,Name,ParentsEmail,hash)
+					VALUES (?,?,?,?,?,?,?,?)";
+			//avatarSetup,avatarImage,
+
+			$mail = new Child_Functions();
+			//prepared query statements
+			if($stmt = $mysqli -> prepare($sql)){
+				$stmt ->bind_param("ssssssss",$username,$md5_password,$name,$parentEmail,$hash);
+				$stmt ->execute();
+				$stmt ->bind_result($result);
+		
+				if($stmt->affected_rows>0){
+					echo 'Email sent';
+					$mail -> VerificationParent($parentEmail, $name, $hash);
+				} else {
+					echo 'Error - could not register';
+				}
+				$stmt->close();
+		
+			}else{
+				echo 'Failed register child database query';
+				echo $stmt->errno;
+			}	
+		}$connect->close();
+	}	
+}
+
+$obj = new Register_Child();
+$obj->RegisterUser('Ronny123','pass','Ron','alex_kell@hotmail.co.uk','hi','hi','hi');

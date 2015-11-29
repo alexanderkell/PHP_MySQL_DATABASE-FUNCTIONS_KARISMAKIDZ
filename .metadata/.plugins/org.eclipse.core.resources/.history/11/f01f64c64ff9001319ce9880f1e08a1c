@@ -1,0 +1,27 @@
+<?php
+
+class DatabaseConnect{
+	//create constructor (auto called in new instance of class)
+	public function __construct($db_host, $db_username, $db_password){ 
+		echo $db_host.'<br>'.$db_username.'<br>'.$db_password;
+		
+		if(!@$this->Connect($db_host, $db_username, $db_password)){
+			echo 'Connection to database failed.';
+		}else{
+			echo 'Connected to database.';
+		}
+			
+	}
+	
+	
+	public function Connect($db_host,$db_username,$db_password){
+		if(!mysql_connect($db_host,$db_username,$db_password)){
+			return false;
+		}else 
+			return true;
+	}
+}
+
+//create instance of DatabaseConnect class
+
+?>

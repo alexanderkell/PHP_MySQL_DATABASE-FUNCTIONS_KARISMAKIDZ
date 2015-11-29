@@ -1,0 +1,18 @@
+<?php
+
+class DatabaseConnect{
+	//create constructor (auto called in new instance of class)
+	public function __construct($db_host, $db_username, $db_password,$mysql_db){ 
+		$mysqli = new mysqli($db_host, $db_username, $db_password, $mysql_db);
+		
+		if(!$mysqli->connect_errno){
+			return $mysqli;
+		}else{
+			echo 'Could not connect to MySQL: ('. $mysqli->connect_errno. ') ' . $mysqli->connect_error;
+		}
+
+	}
+}
+
+
+?>

@@ -1,0 +1,28 @@
+<?php
+include 'DatabaseConnect.php';
+
+$db_host='localhost';
+$db_username='root';
+$db_password='root';
+$mysql_db='parents';
+
+
+function alexPHP(){		
+	if($result = $db->query("SELECT * FROM people")){
+		if($count = $result->num_rows){
+			echo $count;
+			$rows = $result->fetch_assoc();
+			echo '<pre>', print_r($rows), '<pre>';
+		}
+	}
+}
+
+$connect = new DatabaseConnect($db_host, $db_password,$db_password,$mysql_db);
+
+function RegisterUser($username,$password,$name,$parentEmail,$avatarSetup,$avatarImage){
+	
+	
+
+	
+}
+?>

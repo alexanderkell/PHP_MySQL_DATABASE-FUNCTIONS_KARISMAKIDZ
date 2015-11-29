@@ -1,0 +1,49 @@
+<?php
+class RegisterParent{
+	
+	public function __($email,$password,$title,$sex,$nickname,$firstname,$lastname){
+	
+		$db_host='localhost';
+		$db_username='root';
+		$db_password='root';
+		$mysql_db='karisma_test';
+	
+		//check valid email address
+		if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+			echo("email is not valid");
+			die();
+		}
+	
+		//md5 level password encryption
+		$md5_password=md5($password);
+	
+		//connect to database
+		$mysqli = new mysqli($db_host, $db_username, $db_password, $mysql_db);
+		if(mysqli_connect_errno()) {
+			echo "Connection Failed: " . mysqli_connect_errno();
+			exit();
+		}
+	
+		$sql = "INSERT INTO parents (email,password,title,sex,nickname,firstname,lastname)
+				VALUES (?,?,?,?,?,?,?)";
+	
+		//prepared query statements
+		if($stmt = $mysqli -> prepare($sql) ){
+			$stmt ->bind_param("sssssss",$email,$md5_password,$title,$sex,$nickname,$firstname,$lastname);
+			$stmt ->execute();
+			$stmt ->bind_result($result);
+	
+			if($stmt->affected_rows>0){
+				echo 'Successfully registered';
+				mail($email,"Karisma Kidz account registration confirmation","Dear ".$name.",\n	Thank you for registering!");
+			} else {
+				echo 'Error - could not register';
+			}
+			$stmt->close();
+	
+		}else{
+			echo 'Failed query';
+		}
+		$connect->close();
+	}
+}

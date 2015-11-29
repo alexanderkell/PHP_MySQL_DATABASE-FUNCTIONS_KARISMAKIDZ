@@ -1,0 +1,9 @@
+<?php
+include DatabaseConnect.php;
+
+$connect = new DatabaseConnect('', $db_username, $db_password)
+
+
+//$connect = new DatabaseConnect('localhost', 'root', '');
+echo 'hi';
+?>

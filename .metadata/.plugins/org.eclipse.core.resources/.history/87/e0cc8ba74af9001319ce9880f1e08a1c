@@ -1,0 +1,6 @@
+<?php
+include DatabaseConnect.php;
+
+$connect = new DatabaseConnect('localhost', 'root', '');
+echo 'hi';
+?>

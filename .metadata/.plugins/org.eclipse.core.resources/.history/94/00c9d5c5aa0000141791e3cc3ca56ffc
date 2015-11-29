@@ -1,0 +1,132 @@
+<?php
+include_once 'DatabaseConnect.php';
+//include 'RegisterParent.php';
+class Parents{
+	
+	function alexPHP(){		
+		if($result = $db->query("SELECT * FROM people")){
+			if($count = $result->num_rows){
+				echo $count;
+				$rows = $result->fetch_assoc();
+				echo '<pre>', print_r($rows), '<pre>';
+			}
+		}
+	}
+	
+	function VerificationEmail($email, $name, $hash){
+		$to = $email;
+		$subject = 'Karisma Kidz verification';
+		$message = 'Hi '. $name . '/n 
+				Thank you for signing up, your account has been created. \n
+				You can login with your email address ' .$email. '\n\n
+				Please click this link to verify your email:\n
+				http://www.karismakidz.co.uk/verify.php?email='.$email.'&hash='.$hash.' ';
+		$headers = 'From noreply@karismakidz.co.uk';
+		mail($to, $subject, $message, $headers);	
+	}
+	
+	function SendForgotPasswordEmail($email){
+		include_once '../config/Config.php';
+		
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		
+		$queryHash = "SELECT hash FROM parents WHERE email =?"; 
+		if($stmt1 = $mysqli->prepare($queryHash)){
+			$stmt1->bind_param("s",$email);
+			$stmt1->execute();
+			$stmt1->bind_result($hash);
+			$stmt1->fetch();
+		}
+		
+		$to = $email;
+		$subject = 'Password reset - Karisma Kidz';
+		$message = 'To reset your password please click the following link:\n
+					www.karismakidz.co.uk/password_reset.php?email='.$email.'&hash='.$hash.';
+				';
+		$headers = 'From noreply@karismakidz.co.uk';
+		mail($to, $subject, $message, $headers);
+
+		$mysqli->close();
+	}
+	
+	function UpdateParentAccount($Password, $NickName, $FirstName, $LastName, $Email, $Password, $Sex, $Title){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		$mysqli2=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+		
+		
+		$encPass = md5($Password);
+		$Email = 'alex_kell@hotmail.co.uk';
+		$pass = "SELECT password FROM parents 
+				WHERE Email = ? AND Password = ?";
+		
+		if($stmt = $mysqli->prepare($pass)){
+			$stmt->bind_param("ss",$Email,$encPass);
+			$stmt->execute();
+			$stmt->bind_result($login);
+			$stmt->fetch();
+
+			if($login){
+				echo 'Successfully logged in.\n';
+				
+				$updateQuery = "UPDATE parents
+								SET NickName = ?, FirstName = ?, LastName = ?, Sex = ?, Title = ?
+								WHERE Password = ? AND Email = ?";
+				
+				if($upd = $mysqli2->prepare($updateQuery)){
+					$upd->bind_param('sssssss', $NickName, $FirstName, $LastName, $Sex, $Title, $encPass, $Email);
+					$upd->execute();
+					$upd->bind_result($login);
+					$upd->fetch();
+					echo 'Updated fields';
+				}else{
+					echo 'Could not update fields';
+				}				
+			}else{
+				echo 'Account details do not exist, please try again.';
+			}
+		}
+		$mysqli->close();
+		$mysqli2->close();
+	}
+
+	function LoginParent($Password, $Email){
+		include_once '../config/Config.php';
+		$conn = new DatabaseConnect();
+		$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);		
+		
+		$encPass = md5($Password);
+		$encPass = '49f68a5c8493ec2c0bf489821c21fc3b';
+		$Email = 'alex_kell@hotmail.co.uk';
+		$pass = "SELECT * FROM parents 
+				WHERE Email = ? AND Password = ?";
+		
+		if($stmt = $mysqli->prepare($pass)){
+			$stmt->bind_param("ss",$Email,$encPass);
+			$stmt->execute();
+			$stmt->bind_result($login);
+			$stmt->fetch();
+
+			if($login){
+				$row = $login->fetch_array(MYSQLI_ASSOC);
+				var_dump($row);
+			}else{
+				echo "didn't work";
+			}
+		
+		}
+
+	}
+}
+
+
+
+$obj = new Parents();
+//$obj->SendForgotPasswordEmail('dfsffsdsd@hotmail.co.uk');
+//$obj -> UpdateParentAccount('hi','hi','no','no','alex_kell@hotmail.co.uk','hi','F','Mr')
+$obj->LoginParent('alex_kell@hotmail.co.uk','hi')
+
+
+?>

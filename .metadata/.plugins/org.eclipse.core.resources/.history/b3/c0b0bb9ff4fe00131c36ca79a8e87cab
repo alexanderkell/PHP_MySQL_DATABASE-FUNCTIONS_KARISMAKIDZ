@@ -1,0 +1,50 @@
+<?php 
+
+?>
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+	<title>Email Verification</title>	
+</head>
+<body>
+
+<?php 
+include 'functions/Parents.php';
+include 'functions/DatabaseConnect.php';
+$conn = new DatabaseConnect();
+
+$db_host='localhost';
+$db_username='root';
+$db_password='root';
+$mysql_db='karisma_test';
+
+$mysqli=$conn->connect($db_host, $db_username, $db_password, $mysql_db);
+
+//if(isset($_GET['email']) && !empty($_GET['email']) AND isset($_GET['hash']) && !empty($_GET['hash'])){
+	// Verify data
+	//$email = mysql_escape_string($_GET['email']); // Set email variable
+	//$hash = mysql_escape_string($_GET['hash']); // Set hash variable
+
+	$email = 'alex_kell@hotmail.co.uk';
+	$hash = '02aff7969b61d33fe215dba6bf0056c8';
+	$query = "SELECT Email, hash, active FROM parents WHERE email='".$email."' AND hash='".$hash."' AND active='0'";
+
+	if(!$search = $mysqli -> query($query)){
+		echo 'Can not connect. Error: ' .mysqli_error($mysqli);
+	}else{
+		$match  = mysqli_num_rows($search);
+		if($match > 0){
+			$update = "UPDATE parents SET active ='1' WHERE email ='".$email."' 
+					   AND hash='".$hash."' AND active = '0'"; 
+			$mysqli->query($update);
+			echo 'updated';
+		}
+			
+	}
+	mysqli_close($conn)
+?>
+
+</body>

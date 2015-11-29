@@ -1,0 +1,3 @@
+eclipse.preferences.version=1
+org.eclipse.php.debug.core.pathMapper=<pathMappers><item1><server>Default PHP Web Server</server><mapper><item1><remote>/Users/alexkell/Documents/Karisma_Kidz/Workspace/Database_functions</remote><type>WORKSPACE</type><local>/Database_functions</local></item1></mapper></item1></pathMappers>
+org.eclipse.php.debug.corephp_debugger_id=org.eclipse.php.debug.core.xdebugDebugger

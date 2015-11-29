@@ -1,0 +1,10 @@
+<?php
+
+class DatabaseConnect{
+	//create constructor (auto called in new instance of class)
+	public function __construct($db_host, $db_username, $db_password){ 
+		echo $db_host.'<br>'.$db_username.'<br>'.$db_password;
+	}
+}
+
+?>

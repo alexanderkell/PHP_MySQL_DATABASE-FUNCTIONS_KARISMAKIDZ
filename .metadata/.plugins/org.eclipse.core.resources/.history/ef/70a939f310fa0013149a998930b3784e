@@ -1,0 +1,14 @@
+<?php
+include 'DatabaseConnect.php';
+
+$db_host='localhost';
+$db_username='root';
+$db_password='root';
+
+$connect = new DatabaseConnect($db_host, $db_password,$db_password);
+
+function RegisterUser($username,$password,$name,$parentEmail,
+						$avatarSetup,$avatarImage){
+	
+}
+?>

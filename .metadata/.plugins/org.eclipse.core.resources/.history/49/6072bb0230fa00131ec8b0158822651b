@@ -1,0 +1,38 @@
+<?php
+include 'DatabaseConnect.php';
+
+$db_host='localhost';
+$db_username='root';
+$db_password='root';
+$msql_db='parents';
+
+function security(){
+	$sql = "select id from users where username=?",
+			"and password =?";
+	
+	$stmt = $conn->prepare($sql); //$stmt now has additional methods to increase security
+	//type to pass - here string/string: i-integer, d-double
+	$stmt->bind_param('ss',$_POST['username'],$_POST['password']) 
+	
+}
+
+function alexPHP(){		
+	if($result = $db->query("SELECT * FROM people")){
+		if($count = $result->num_rows){
+			echo $count;
+			$rows = $result->fetch_assoc();
+			echo '<pre>', print_r($rows), '<pre>';
+		}
+	}
+}
+
+$connect = new DatabaseConnect($db_host, $db_password,$db_password);
+
+function RegisterUser($username,$password,$name,$parentEmail,
+						$avatarSetup,$avatarImage){
+	
+	
+
+	
+}
+?>

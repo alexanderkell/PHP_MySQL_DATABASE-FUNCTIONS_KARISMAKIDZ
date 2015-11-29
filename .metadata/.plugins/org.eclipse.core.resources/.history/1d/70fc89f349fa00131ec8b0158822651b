@@ -1,0 +1,57 @@
+<?php
+include 'DatabaseConnect.php';
+
+
+
+
+function alexPHP(){		
+	if($result = $db->query("SELECT * FROM people")){
+		if($count = $result->num_rows){
+			echo $count;
+			$rows = $result->fetch_assoc();
+			echo '<pre>', print_r($rows), '<pre>';
+		}
+	}
+}
+
+function RegisterUser($email,$password,$title,$sex,$nickname,$firstname,$lastname){
+	
+$db_host='localhost';
+$db_username='root';
+$db_password='root';
+$mysql_db='karisma_test';
+	
+	$connect = new DatabaseConnect($db_host, $db_password,$db_password,$mysql_db);
+	$md5_password=md5($password);
+	
+	$mysqli = new mysqli('localhost', 'root', 'root', 'karisma_test');
+	
+	if(mysqli_connect_errno()) {
+		echo "Connection Failed: " . mysqli_connect_errno();
+		exit();
+	}
+	
+	$sql = "INSERT INTO parents (email,password,title,sex,nickname,firstname,lastname) 
+			VALUES (?,?,?,?,?,?,?)";
+	//prepare statement
+	
+	if($stmt = $mysqli -> prepare($query) ){
+		echo 'prepared statement';
+		//bind parameters
+		$stmt ->bind_param("sssssss",$email,$password,$title,$sex,$nickname,$firstname,$lastname);
+		//Execute
+		$stmt ->execute();
+		//Bind results
+		$stmt ->bind_result($result);
+		//Close statement
+		$stmt->close();
+		echo $stmt;
+	}else{
+		echo 'Statement not prepared';
+	}
+	$connect->close();	
+}
+RegisterUser("alex_kell@hotmail.co.uk", "alex", "Mr", "M", "AlexNick", "Alex", "Kell");
+
+?>
+html
